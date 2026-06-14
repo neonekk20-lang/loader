@@ -472,15 +472,23 @@ rayParams.FilterType = Enum.RaycastFilterType.Exclude
 
 local function isVisible(targetPart)
     local char = LocalPlayer.Character
-    if not char then return true end
+    if not char then return false end
+    
+    local rayParams = RaycastParams.new()
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
     rayParams.FilterDescendantsInstances = {char}
+    
     local origin = Camera.CFrame.Position
-    local dir = (targetPart.Position - origin)
-    local result = workspace:Raycast(origin, dir * 0.98, rayParams)
-    if result then
-        local hit = result.Instance
+    local direction = (targetPart.Position - origin)
+    local rayResult = workspace:Raycast(origin, direction.Unit * direction.Magnitude * 0.99, rayParams)
+    
+    if rayResult then
+        local hit = rayResult.Instance
         local targetChar = targetPart.Parent
-        return hit:IsDescendantOf(targetChar)
+        if targetChar then
+            return hit:IsDescendantOf(targetChar)
+        end
+        return false
     end
     return true
 end
